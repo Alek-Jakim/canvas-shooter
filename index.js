@@ -1,3 +1,5 @@
+import { randomNum } from "./utils.js"
+
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
@@ -9,21 +11,9 @@ canvas.height = innerHeight;
 const x_coord = canvas.width / 2;
 const y_coord = canvas.height / 2;
 
-// generate random number
-function randomNum(start, end) {
-    if (!start || !end) return Math.floor(Math.random() * 11);
-    let numsArr = [];
+const enemySpeed = 1000;
 
-    if (start > end) return "Wrong input";
 
-    for (let i = start; i <= end; i++) {
-        numsArr.push(i);
-    }
-
-    let index = Math.floor(Math.random() * numsArr.length);
-
-    return numsArr[index];
-}
 
 // Create player
 class Player {
@@ -93,10 +83,8 @@ class Enemy {
 
 
 
-const player = new Player(x_coord, y_coord, 30, "#333");
+const player = new Player(x_coord, y_coord, 30, "#fff");
 player.draw();
-
-
 
 
 // Group projectiles - management for multiple instances of the same object
@@ -122,7 +110,7 @@ function spawnEnemies() {
             x = Math.random() * canvas.width;
             y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
         }
-        const color = "green";
+        let color = (radius >= 10 && radius <= 20) ? "#42FF33" : (radius >= 20 && radius <= 30) ? "#039CDA" : "#9D33DD";
 
 
         //Get the x,y velocity
@@ -137,13 +125,15 @@ function spawnEnemies() {
         }
 
         enemies.push(new Enemy(x, y, radius, color, velocity));
-    }, 1000);
+    }, enemySpeed);
 }
 
 
+let animationId;
+
 //Animation Loop
 function animate() {
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
 
     //Clear the canvas so you don't get lines but actual projectiles
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -158,12 +148,20 @@ function animate() {
     enemies.forEach((enemy, enemyIndex) => {
         enemy.update();
 
+        const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+
+
+        if (distance - enemy.radius - player.radius < 3) {
+            cancelAnimationFrame(animationId);
+            console.log("game over");
+        }
+
         projectiles.forEach((projectile, projectileIndex) => {
             //hypot = hypotenuse aka the distance between two points
             const distance = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
 
             //remove projectile & enemy upon collision
-            if (distance - enemy.radius - projectile.radius < 1) {
+            if (distance - enemy.radius - projectile.radius < 0.5) {
 
                 //setTimeout is to prevent the flash effect upon collision
                 setTimeout(() => {
