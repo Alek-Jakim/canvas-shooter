@@ -137,9 +137,7 @@ function spawnEnemies() {
         }
 
         enemies.push(new Enemy(x, y, radius, color, velocity));
-
-        console.log(enemies)
-    }, 2000);
+    }, 1000);
 }
 
 
@@ -157,8 +155,23 @@ function animate() {
     });
 
 
-    enemies.forEach((enemy) => {
+    enemies.forEach((enemy, enemyIndex) => {
         enemy.update();
+
+        projectiles.forEach((projectile, projectileIndex) => {
+            //hypot = hypotenuse aka the distance between two points
+            const distance = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
+
+            //remove projectile & enemy upon collision
+            if (distance - enemy.radius - projectile.radius < 1) {
+
+                //setTimeout is to prevent the flash effect upon collision
+                setTimeout(() => {
+                    enemies.splice(enemyIndex, 1);
+                    projectiles.splice(projectileIndex, 1);
+                }, 0)
+            }
+        })
     })
 };
 
@@ -175,7 +188,7 @@ addEventListener("click", (event) => {
     const velocity = {
         x: Math.cos(angle),
         y: Math.sin(angle)
-    }
+    };
 
     projectiles.push(new Projectile(player.x, player.y, 5, "red", velocity))
 });
