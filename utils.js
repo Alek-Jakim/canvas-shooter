@@ -13,6 +13,3 @@ export function randomNum(start, end) {
 
     return numsArr[index];
 }
-
-
-

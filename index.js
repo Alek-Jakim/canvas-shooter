@@ -1,4 +1,5 @@
 import { randomNum } from "./utils.js"
+import { Player, Enemy, Projectile } from "./classes.js"
 
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
@@ -11,77 +12,7 @@ canvas.height = innerHeight;
 const x_coord = canvas.width / 2;
 const y_coord = canvas.height / 2;
 
-const enemySpeed = 1000;
-
-
-
-// Create player
-class Player {
-    constructor(x, y, radius, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-};
-
-
-//Create Projectiles - anytime when you need a multiple instances of sth, create a class
-class Projectile {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-
-    update() {
-        this.draw();
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
-    }
-}
-
-//Create Enemy
-class Enemy {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-
-    update() {
-        this.draw();
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
-    }
-}
-
-
+const enemySpeed = 15000;
 
 const player = new Player(x_coord, y_coord, 30, "#fff");
 player.draw();
@@ -140,8 +71,19 @@ function animate() {
 
     //redraw the player after clearing the canvas
     player.draw();
-    projectiles.forEach((projectile) => {
-        projectile.update()
+    projectiles.forEach((projectile, index) => {
+        projectile.update();
+
+        //remove projectile from edge of screen
+        if (
+            projectile.x + projectile.radius < 0 ||
+            projectile.x - projectile.radius > canvas.width ||
+            projectile.y + projectile.radius < 0 ||
+            projectile.y - projectile.radius > canvas.height) {
+            setTimeout(() => {
+                projectiles.splice(index, 1);
+            }, 0);
+        }
     });
 
 
@@ -152,6 +94,7 @@ function animate() {
 
 
         if (distance - enemy.radius - player.radius < 3) {
+            // this stops the animation when player gets hit - indicating game over
             cancelAnimationFrame(animationId);
             console.log("game over");
         }
@@ -174,9 +117,8 @@ function animate() {
 };
 
 
-
 addEventListener("click", (event) => {
-
+    console.log(projectiles);
     //Get the x,y velocity
     const angle = Math.atan2(
         event.clientY - canvas.height / 2,
@@ -188,7 +130,10 @@ addEventListener("click", (event) => {
         y: Math.sin(angle)
     };
 
-    projectiles.push(new Projectile(player.x, player.y, 5, "red", velocity))
+    console.log(velocity)
+
+    projectiles.push(new Projectile(player.x, player.y, 5, "red", velocity));
+
 });
 
 animate();
