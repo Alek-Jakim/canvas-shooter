@@ -3,6 +3,7 @@ import { Player, Enemy, Projectile, Particle } from "./classes.js"
 
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
+const scoreEl = document.getElementById("score");
 
 // 1st thing is always set the canvas width & height
 canvas.width = innerWidth;
@@ -67,7 +68,7 @@ function spawnEnemies() {
 
 
 let animationId;
-
+let score = 0;
 //Animation Loop
 function animate() {
     animationId = requestAnimationFrame(animate);
@@ -130,7 +131,6 @@ function animate() {
             //remove projectile & enemy upon collision
             if (distance - enemy.radius - projectile.radius < 0.5) {
 
-
                 // CREATE EXPLOSIONS
                 // enemy.radius * 2 -> more particles will be generated for bigger enemies
                 for (let i = 0; i < enemy.radius * 2; i++) {
@@ -144,6 +144,8 @@ function animate() {
 
                 //Shrink the enemy if it's a certain size
                 if (enemy.radius - 10 > 5) {
+                    // if we shrink the enemy, get a smaller score
+                    score += 12;
                     // Using GSAP to gradually shrink the enemy instead of instantly - creates a nice visual effect (script tag included in html)
                     gsap.to(enemy, {
                         radius: enemy.radius - 10
@@ -152,12 +154,16 @@ function animate() {
                         projectiles.splice(projectileIndex, 1);
                     }, 0)
                 } else {
+                    // if we destroy the enemy, get a bigger score
+                    score += 18;
                     //setTimeout is to prevent the flash effect upon collision
+                    //Remove enemy if too small
                     setTimeout(() => {
                         enemies.splice(enemyIndex, 1);
                         projectiles.splice(projectileIndex, 1);
                     }, 0)
                 }
+                scoreEl.innerHTML = score;
             }
         })
     })
@@ -173,8 +179,8 @@ addEventListener("click", (event) => {
 
     // multiply velocity by 4 for faster projectiles
     const velocity = {
-        x: Math.cos(angle) * 4,
-        y: Math.sin(angle) * 4
+        x: Math.cos(angle) * 5,
+        y: Math.sin(angle) * 5
     };
 
     projectiles.push(new Projectile(player.x, player.y, 5, "#fff", velocity));

@@ -16,13 +16,27 @@
         body {
             cursor: crosshair;
         }
+
+        .score-container {
+            position: absolute;
+            color: #fff;
+            padding: 20px;
+            font-size: 20px;
+            font-family: sans-serif;
+            /*Makes the html element unselectable*/
+            user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -o-user-select: none;
+        }
     </style>
 </head>
 
 <body>
 
-    <div>
-        <span></span>
+    <div class="score-container">
+        <span>Score: <span id="score">0</span></span>
     </div>
 
     <canvas id="canvas1"></canvas>
