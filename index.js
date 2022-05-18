@@ -12,9 +12,9 @@ canvas.height = innerHeight;
 const x_coord = canvas.width / 2;
 const y_coord = canvas.height / 2;
 
-const enemySpeed = 15000;
+const enemySpeed = 1000;
 
-const player = new Player(x_coord, y_coord, 30, "#fff");
+const player = new Player(x_coord, y_coord, 10, "#fff");
 player.draw();
 
 
@@ -41,7 +41,9 @@ function spawnEnemies() {
             x = Math.random() * canvas.width;
             y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
         }
-        let color = (radius >= 10 && radius <= 20) ? "#42FF33" : (radius >= 20 && radius <= 30) ? "#039CDA" : "#9D33DD";
+        // let color = (radius >= 10 && radius <= 20) ? "#42FF33" : (radius >= 20 && radius <= 30) ? "#039CDA" : "#9D33DD";
+
+        const color = `hsl(${Math.floor(Math.random() * 361)}, 50%, 50%)`
 
 
         //Get the x,y velocity
@@ -50,9 +52,10 @@ function spawnEnemies() {
             canvas.width / 2 - x
         );
 
+        // multiply velocity by 2 for faster enemies
         const velocity = {
-            x: Math.cos(angle),
-            y: Math.sin(angle)
+            x: Math.cos(angle) * 2,
+            y: Math.sin(angle) * 2
         }
 
         enemies.push(new Enemy(x, y, radius, color, velocity));
@@ -67,7 +70,12 @@ function animate() {
     animationId = requestAnimationFrame(animate);
 
     //Clear the canvas so you don't get lines but actual projectiles
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //rgba used to give the elements a blur effect
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)"
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 
     //redraw the player after clearing the canvas
     player.draw();
@@ -106,11 +114,24 @@ function animate() {
             //remove projectile & enemy upon collision
             if (distance - enemy.radius - projectile.radius < 0.5) {
 
-                //setTimeout is to prevent the flash effect upon collision
-                setTimeout(() => {
-                    enemies.splice(enemyIndex, 1);
-                    projectiles.splice(projectileIndex, 1);
-                }, 0)
+
+                //Shrink the enemy if it's a certain size
+                if (enemy.radius - 10 > 5) {
+
+                    // Using GSAP to gradually shrink the enemy instead of instantly - creates a nice visual effect (script tag included in html)
+                    gsap.to(enemy, {
+                        radius: enemy.radius - 10
+                    })
+                    setTimeout(() => {
+                        projectiles.splice(projectileIndex, 1);
+                    }, 0)
+                } else {
+                    //setTimeout is to prevent the flash effect upon collision
+                    setTimeout(() => {
+                        enemies.splice(enemyIndex, 1);
+                        projectiles.splice(projectileIndex, 1);
+                    }, 0)
+                }
             }
         })
     })
@@ -118,21 +139,19 @@ function animate() {
 
 
 addEventListener("click", (event) => {
-    console.log(projectiles);
     //Get the x,y velocity
     const angle = Math.atan2(
         event.clientY - canvas.height / 2,
         event.clientX - canvas.width / 2
     );
 
+    // multiply velocity by 4 for faster projectiles
     const velocity = {
-        x: Math.cos(angle),
-        y: Math.sin(angle)
+        x: Math.cos(angle) * 4,
+        y: Math.sin(angle) * 4
     };
 
-    console.log(velocity)
-
-    projectiles.push(new Projectile(player.x, player.y, 5, "red", velocity));
+    projectiles.push(new Projectile(player.x, player.y, 5, "#fff", velocity));
 
 });
 
