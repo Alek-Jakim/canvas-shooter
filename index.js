@@ -1,5 +1,5 @@
 import { randomNum } from "./utils.js"
-import { Player, Enemy, Projectile } from "./classes.js"
+import { Player, Enemy, Projectile, Particle } from "./classes.js"
 
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
@@ -12,7 +12,7 @@ canvas.height = innerHeight;
 const x_coord = canvas.width / 2;
 const y_coord = canvas.height / 2;
 
-const enemySpeed = 1000;
+const enemySpeed = 3000;
 
 const player = new Player(x_coord, y_coord, 10, "#fff");
 player.draw();
@@ -23,6 +23,9 @@ const projectiles = [];
 
 //Enemies array
 const enemies = [];
+
+//Particles array
+const particles = [];
 
 
 function spawnEnemies() {
@@ -79,6 +82,19 @@ function animate() {
 
     //redraw the player after clearing the canvas
     player.draw();
+
+
+    // LOOP THROUGH PARTICLES
+    particles.forEach((particle, index) => {
+        particle.update();
+
+        if (particle.alpha <= 0) {
+            particles.splice(index, 1);
+        }
+    })
+
+
+    // LOOP THROUGH PROJECTILES
     projectiles.forEach((projectile, index) => {
         projectile.update();
 
@@ -95,11 +111,11 @@ function animate() {
     });
 
 
+    // LOOP THROUGH ENEMIES
     enemies.forEach((enemy, enemyIndex) => {
         enemy.update();
 
         const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
-
 
         if (distance - enemy.radius - player.radius < 3) {
             // this stops the animation when player gets hit - indicating game over
@@ -115,9 +131,19 @@ function animate() {
             if (distance - enemy.radius - projectile.radius < 0.5) {
 
 
+                // CREATE EXPLOSIONS
+                // enemy.radius * 2 -> more particles will be generated for bigger enemies
+                for (let i = 0; i < enemy.radius * 2; i++) {
+                    particles.push(new Particle(projectile.x, projectile.y, Math.random() * 3, enemy.color, {
+                        // get a random negative or positive number
+                        x: (Math.random() - 0.5) * (Math.random() * 6),
+                        y: (Math.random() - 0.5) * (Math.random() * 6)
+                    }))
+                }
+
+
                 //Shrink the enemy if it's a certain size
                 if (enemy.radius - 10 > 5) {
-
                     // Using GSAP to gradually shrink the enemy instead of instantly - creates a nice visual effect (script tag included in html)
                     gsap.to(enemy, {
                         radius: enemy.radius - 10
