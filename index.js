@@ -9,6 +9,10 @@ const scoreEl = document.getElementById("score");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+//Mouse position coordinates for keyboard event (needed to find mouse position) - updated on mousemove event
+let clientX;
+let clientY;
+
 // Center player coordinates
 const x_coord = canvas.width / 2;
 const y_coord = canvas.height / 2;
@@ -86,17 +90,20 @@ function animate() {
 
 
     // LOOP THROUGH PARTICLES
-    particles.forEach((particle, index) => {
+    for (let index = particles.length - 1; index >= 0; index--) {
+        const particle = particles[index];
+
         particle.update();
 
         if (particle.alpha <= 0) {
             particles.splice(index, 1);
         }
-    })
-
+    }
 
     // LOOP THROUGH PROJECTILES
-    projectiles.forEach((projectile, index) => {
+    for (let index = projectiles.length - 1; index >= 0; index--) {
+        const projectile = projectiles[index];
+
         projectile.update();
 
         //remove projectile from edge of screen
@@ -105,15 +112,16 @@ function animate() {
             projectile.x - projectile.radius > canvas.width ||
             projectile.y + projectile.radius < 0 ||
             projectile.y - projectile.radius > canvas.height) {
-            setTimeout(() => {
-                projectiles.splice(index, 1);
-            }, 0);
-        }
-    });
 
+            projectiles.splice(index, 1);
+
+        }
+    }
 
     // LOOP THROUGH ENEMIES
-    enemies.forEach((enemy, enemyIndex) => {
+    for (let enemyIndex = enemies.length - 1; enemyIndex >= 0; enemyIndex--) {
+        const enemy = enemies[enemyIndex];
+
         enemy.update();
 
         const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
@@ -124,7 +132,9 @@ function animate() {
             console.log("game over");
         }
 
-        projectiles.forEach((projectile, projectileIndex) => {
+        for (let projectileIndex = projectiles.length - 1; projectileIndex >= 0; projectileIndex--) {
+            const projectile = projectiles[projectileIndex];
+
             //hypot = hypotenuse aka the distance between two points
             const distance = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
 
@@ -140,8 +150,6 @@ function animate() {
                         y: (Math.random() - 0.5) * (Math.random() * 6)
                     }))
                 }
-
-
                 //Shrink the enemy if it's a certain size
                 if (enemy.radius - 10 > 5) {
                     // if we shrink the enemy, get a smaller score
@@ -150,26 +158,21 @@ function animate() {
                     gsap.to(enemy, {
                         radius: enemy.radius - 10
                     })
-                    setTimeout(() => {
-                        projectiles.splice(projectileIndex, 1);
-                    }, 0)
+                    projectiles.splice(projectileIndex, 1);
                 } else {
                     // if we destroy the enemy, get a bigger score
                     score += 18;
-                    //setTimeout is to prevent the flash effect upon collision
                     //Remove enemy if too small
-                    setTimeout(() => {
-                        enemies.splice(enemyIndex, 1);
-                        projectiles.splice(projectileIndex, 1);
-                    }, 0)
+                    enemies.splice(enemyIndex, 1);
+                    projectiles.splice(projectileIndex, 1);
                 }
                 scoreEl.innerHTML = score;
             }
-        })
-    })
+        }
+    }
 };
 
-
+// Fire projectile event
 addEventListener("click", (event) => {
     //Get the x,y velocity
     const angle = Math.atan2(
@@ -184,8 +187,35 @@ addEventListener("click", (event) => {
     };
 
     projectiles.push(new Projectile(player.x, player.y, 5, "#fff", velocity));
-
 });
+
+
+// Fire projectile event
+addEventListener("keyup", (event) => {
+
+    if (event.key === "f" || event.key === "F") {
+        //Get the x,y velocity
+        const angle = Math.atan2(
+            clientY - canvas.height / 2,
+            clientX - canvas.width / 2
+        );
+
+        // multiply velocity by 4 for faster projectiles
+        const velocity = {
+            x: Math.cos(angle) * 5,
+            y: Math.sin(angle) * 5
+        };
+
+        projectiles.push(new Projectile(player.x, player.y, 5, "#fff", velocity));
+    }
+});
+
+
+
+addEventListener("mousemove", (event) => {
+    clientX = event.clientX;
+    clientY = event.clientY;
+})
 
 animate();
 spawnEnemies();
