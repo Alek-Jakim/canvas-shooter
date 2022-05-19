@@ -4,6 +4,8 @@ import { Player, Enemy, Projectile, Particle } from "./classes.js"
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("score");
+const gameOverScore = document.getElementById("game-over-score");
+const gameOverModal = document.getElementById("modal");
 
 // 1st thing is always set the canvas width & height
 canvas.width = innerWidth;
@@ -17,7 +19,7 @@ let clientY;
 const x_coord = canvas.width / 2;
 const y_coord = canvas.height / 2;
 
-const enemySpeed = 3000;
+const enemySpeed = 1500;
 
 const player = new Player(x_coord, y_coord, 10, "#fff");
 player.draw();
@@ -129,7 +131,7 @@ function animate() {
         if (distance - enemy.radius - player.radius < 3) {
             // this stops the animation when player gets hit - indicating game over
             cancelAnimationFrame(animationId);
-            console.log("game over");
+            gameOverModal.style.display = "block"
         }
 
         for (let projectileIndex = projectiles.length - 1; projectileIndex >= 0; projectileIndex--) {
@@ -167,6 +169,7 @@ function animate() {
                     projectiles.splice(projectileIndex, 1);
                 }
                 scoreEl.innerHTML = score;
+                gameOverScore.innerHTML = score;
             }
         }
     }

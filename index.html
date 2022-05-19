@@ -5,32 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
     <title>Canvas Shooter</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            cursor: crosshair;
-        }
-
-        .score-container {
-            position: absolute;
-            color: #fff;
-            padding: 20px;
-            font-size: 20px;
-            font-family: sans-serif;
-            /*Makes the html element unselectable*/
-            user-select: none;
-            -moz-user-select: none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-            -o-user-select: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -39,13 +15,19 @@
         <span>Score: <span id="score">0</span></span>
     </div>
 
+    <div class="game-over-container" id="modal">
+        <h1 class="game-over-text">Game Over</h1>
+        <h3 class="game-over-score"><span id="game-over-score">0</span></h3>
+        <p>Points</p>
+    </div>
+
     <canvas id="canvas1"></canvas>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"
         integrity="sha512-VEBjfxWUOyzl0bAwh4gdLEaQyDYPvLrZql3pw1ifgb6fhEvZl9iDDehwHZ+dsMzA0Jfww8Xt7COSZuJ/slxc4Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="module" src="./index.js"></script>
-    <script type="module" src="./classes.js"></script>
+    <!-- <script type="module" src="./classes.js"></script> -->
 </body>
 
 </html>
