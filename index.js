@@ -1,11 +1,15 @@
 import { randomNum } from "./utils.js"
 import { Player, Enemy, Projectile, Particle } from "./classes.js"
 
+// DOM Elements
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("score");
-const gameOverScore = document.getElementById("game-over-score");
-const gameOverModal = document.getElementById("modal");
+const endScoreEl = document.getElementById("game-over-score");
+const modalEl = document.getElementById("modal");
+const buttonEl = document.getElementById("restart-btn");
+
+
 
 // 1st thing is always set the canvas width & height
 canvas.width = innerWidth;
@@ -21,22 +25,42 @@ const y_coord = canvas.height / 2;
 
 const enemySpeed = 1500;
 
-const player = new Player(x_coord, y_coord, 10, "#fff");
+let player = new Player(x_coord, y_coord, 10, "#fff");
 player.draw();
 
 
 // Group projectiles - management for multiple instances of the same object
-const projectiles = [];
-
+let projectiles = [];
 //Enemies array
-const enemies = [];
-
+let enemies = [];
 //Particles array
-const particles = [];
+let particles = [];
+// Needed to stop/restart the animation
+let animationId;
+// Game Score
+let score = 0;
+//Cancel the interval set by spawnEnemies()
+let intervalId;
+
+
+function init() {
+
+    player = new Player(x_coord, y_coord, 10, "white");
+
+    // Reset values
+    enemies = [];
+    projectiles = [];
+    particles = [];
+    score = 0;
+    animationId;
+
+    scoreEl.innerHTML = 0;
+}
 
 
 function spawnEnemies() {
-    setInterval(() => {
+    intervalId = setInterval(() => {
+        console.log(intervalId)
         //Math.random() * (30 - 4) + 4; - get a random num from 4 to 30
 
         const radius = randomNum(10, 40);
@@ -73,8 +97,7 @@ function spawnEnemies() {
 }
 
 
-let animationId;
-let score = 0;
+
 //Animation Loop
 function animate() {
     animationId = requestAnimationFrame(animate);
@@ -131,7 +154,8 @@ function animate() {
         if (distance - enemy.radius - player.radius < 3) {
             // this stops the animation when player gets hit - indicating game over
             cancelAnimationFrame(animationId);
-            gameOverModal.style.display = "block"
+            clearInterval(intervalId);
+            modalEl.style.display = "block"
         }
 
         for (let projectileIndex = projectiles.length - 1; projectileIndex >= 0; projectileIndex--) {
@@ -169,13 +193,16 @@ function animate() {
                     projectiles.splice(projectileIndex, 1);
                 }
                 scoreEl.innerHTML = score;
-                gameOverScore.innerHTML = score;
+                endScoreEl.innerHTML = score;
             }
         }
     }
 };
 
-// Fire projectile event
+
+
+
+// Event Listeners
 addEventListener("click", (event) => {
     //Get the x,y velocity
     const angle = Math.atan2(
@@ -193,7 +220,6 @@ addEventListener("click", (event) => {
 });
 
 
-// Fire projectile event
 addEventListener("keyup", (event) => {
 
     if (event.key === "f" || event.key === "F") {
@@ -214,11 +240,27 @@ addEventListener("keyup", (event) => {
 });
 
 
-
 addEventListener("mousemove", (event) => {
     clientX = event.clientX;
     clientY = event.clientY;
-})
+});
+
+
+buttonEl.addEventListener("click", () => {
+    //Restart and reinitialize game values
+    init();
+
+    // Restart animation loop
+    animate();
+
+    //Deactivate modal
+    modalEl.style.display = "none";
+
+    // Activate enemies after clearing interval
+    spawnEnemies();
+});
+
+
 
 animate();
 spawnEnemies();

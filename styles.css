@@ -61,3 +61,20 @@ body {
     color: #333;
     margin: 0;
 }
+
+#restart-btn {
+    background-color: rgb(104, 38, 104);
+    color: #fff;
+    padding: 10px;
+    font-size: 25px;
+    margin: 30px auto;
+    border: none;
+    border-radius: 15px;
+    max-width: 300px;
+    width: 100%;
+    cursor: pointer;
+}
+
+#restart-btn:active {
+    transform: scale(0.95);
+}
