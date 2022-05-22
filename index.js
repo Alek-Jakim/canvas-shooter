@@ -5,6 +5,7 @@ import { Player, Enemy, Projectile, Particle } from "./classes.js"
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("score");
+const scoreContainerEl = document.querySelector(".score-container");
 const endScoreEl = document.getElementById("game-over-score");
 const modalEl = document.getElementById("modal");
 const buttonEl = document.getElementById("restart-btn");
@@ -62,7 +63,6 @@ function init() {
 
 function spawnEnemies() {
     intervalId = setInterval(() => {
-        console.log(intervalId)
         //Math.random() * (30 - 4) + 4; - get a random num from 4 to 30
 
         const radius = randomNum(10, 40);
@@ -153,11 +153,29 @@ function animate() {
 
         const distance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
 
+        // GAME OVER
         if (distance - enemy.radius - player.radius < 3) {
             // this stops the animation when player gets hit - indicating game over
             cancelAnimationFrame(animationId);
             clearInterval(intervalId);
+            scoreContainerEl.style.display = "none";
+
             modalEl.style.display = "block"
+            gsap.fromTo("#modal", {
+                scale: 0.5,
+                opacity: 0
+            },
+                {
+                    scale: 1,
+                    opacity: 1,
+                    ease: "expo.out",
+                    duration: 0.4,
+                    // onComplete: () => {
+                    //     modalEl.style.display = "block";
+                    // }
+                }
+            )
+
         }
 
         for (let projectileIndex = projectiles.length - 1; projectileIndex >= 0; projectileIndex--) {
@@ -206,6 +224,11 @@ function animate() {
 
 // Event Listeners
 addEventListener("click", (event) => {
+
+    // this is to prevent shooting when clicking start or restart
+    if (event.target === startButtonEl || event.target === buttonEl) {
+        return;
+    }
     //Get the x,y velocity
     const angle = Math.atan2(
         event.clientY - canvas.height / 2,
@@ -256,7 +279,18 @@ buttonEl.addEventListener("click", () => {
     animate();
 
     //Deactivate modal
-    modalEl.style.display = "none";
+    // restart modal animation
+    gsap.to("#modal", {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.4,
+        ease: "expo.in",
+        onComplete: () => {
+            modalEl.style.display = "none";
+        }
+    });
+
+    scoreContainerEl.style.display = "block";
 
     // Activate enemies after clearing interval
     spawnEnemies();
@@ -267,9 +301,18 @@ startButtonEl.addEventListener("click", () => {
     animate();
     spawnEnemies();
 
-    startModalEl.style.display = "none";
+    // start modal animation
+    gsap.to("#start-modal", {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.4,
+        ease: "expo.in",
+        onComplete: () => {
+            startModalEl.style.display = "none";
+        }
+    });
 
-    document.querySelector(".score-container").style.display = "block";
+    scoreContainerEl.style.display = "block";
 });
 
 
