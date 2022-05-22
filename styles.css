@@ -9,6 +9,7 @@ body {
     height: 100%;
     overflow: hidden;
     font-family: sans-serif;
+    background-color: #000;
 }
 
 
@@ -23,9 +24,11 @@ body {
     -khtml-user-select: none;
     -webkit-user-select: none;
     -o-user-select: none;
+    display: none;
 }
 
-.game-over-container {
+.modal-container,
+.modal-start-container {
     position: absolute;
     background-color: #fff;
     top: 50%;
@@ -40,9 +43,14 @@ body {
     display: none;
 }
 
+.modal-start-container {
+    display: block;
+}
+
 
 .game-over-text,
-.game-over-score {
+.game-over-score,
+.start-text {
     padding: 15px;
 }
 
@@ -51,7 +59,8 @@ body {
     font-size: 18px;
 }
 
-.game-over-score {
+.game-over-score,
+.start-text {
     font-size: 45px;
     margin-bottom: 0;
 }
@@ -62,7 +71,22 @@ body {
     margin: 0;
 }
 
-#restart-btn {
+.start-tutorial {
+    text-align: center;
+}
+
+.start-tutorial>span {
+    font-weight: bold;
+    font-size: 20px;
+    color: #333;
+}
+
+.start-tutorial {
+    line-height: 30px;
+}
+
+#restart-btn,
+#start-btn {
     background-color: rgb(104, 38, 104);
     color: #fff;
     padding: 10px;

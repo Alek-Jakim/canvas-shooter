@@ -8,6 +8,8 @@ const scoreEl = document.getElementById("score");
 const endScoreEl = document.getElementById("game-over-score");
 const modalEl = document.getElementById("modal");
 const buttonEl = document.getElementById("restart-btn");
+const startButtonEl = document.getElementById("start-btn");
+const startModalEl = document.getElementById("start-modal");
 
 
 
@@ -75,10 +77,8 @@ function spawnEnemies() {
             x = Math.random() * canvas.width;
             y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
         }
-        // let color = (radius >= 10 && radius <= 20) ? "#42FF33" : (radius >= 20 && radius <= 30) ? "#039CDA" : "#9D33DD";
 
         const color = `hsl(${Math.floor(Math.random() * 361)}, 50%, 50%)`
-
 
         //Get the x,y velocity
         const angle = Math.atan2(
@@ -86,10 +86,12 @@ function spawnEnemies() {
             canvas.width / 2 - x
         );
 
+        let enemySpeed = Math.floor(Math.random() * (3 - 1) + 2);
+
         // multiply velocity by 2 for faster enemies
         const velocity = {
-            x: Math.cos(angle) * 2,
-            y: Math.sin(angle) * 2
+            x: Math.cos(angle) * enemySpeed,
+            y: Math.sin(angle) * enemySpeed
         }
 
         enemies.push(new Enemy(x, y, radius, color, velocity));
@@ -261,6 +263,14 @@ buttonEl.addEventListener("click", () => {
 });
 
 
+startButtonEl.addEventListener("click", () => {
+    animate();
+    spawnEnemies();
 
-animate();
-spawnEnemies();
+    startModalEl.style.display = "none";
+
+    document.querySelector(".score-container").style.display = "block";
+});
+
+
+
